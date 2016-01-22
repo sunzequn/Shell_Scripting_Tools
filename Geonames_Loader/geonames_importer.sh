@@ -10,7 +10,7 @@ download_folder="data"
 
 logo() {
 	echo "================================================================================================"
-	echo "                           G E O N A M E S    D A T A    I M P O R T E R                        "
+	echo "                             G E O N A M E S    D A T A    L O A D E R                          "
  	echo "                  Thanks for the open source project : GeoNames-MySQL-DataImport                "   
     echo "                                        Modified by Sloriac                                     "   
 	echo "================================================================================================"
@@ -30,11 +30,11 @@ usage() {
     echo "    truncate-db Removes geonames data from db."
     echo
     echo " The rest of parameters indicates the following information :"
-	echo "    -u <user>     User name to access database server (default: root).."
+	echo "    -u <user>     User name to access database server (default: root)."
 	echo "    -p <password> User password to access database server (default: root)."
 	echo "    -h <host>     Data Base Server address (default: localhost)."
-	echo "    -r <port>     Data Base Server Port (default: 3306)"
-	echo "    -n <dbname>  Data Base Name for the geonames.org data (default: geonames)"
+	echo "    -r <port>     Data Base Server Port (default: 3306)."
+	echo "    -n <dbname>  Data Base Name for the geonames.org data (default: geonames)."
 	echo "================================================================================================"
     exit -1
 }
@@ -50,11 +50,11 @@ download_geonames_data() {
     for dump in $dumps; do
         wget -c -P "$download_folder" http://download.geonames.org/export/dump/$dump
     done
-    # for zip in $zip_codes; do
-    #     wget -c -P "$download_folder"/zip http://download.geonames.org/export/zip/$zip
-    # done
-    # unzip ./"$download_folder"/zip/"*.zip" -d ./"$download_folder"/zip
-    # rm ./"$download_folder"/zip/*.zip
+    for zip in $zip_codes; do
+        wget -c -P "$download_folder"/zip http://download.geonames.org/export/zip/$zip
+    done
+    unzip ./"$download_folder"/zip/"*.zip" -d ./"$download_folder"/zip
+    rm ./"$download_folder"/zip/*.zip
     unzip ./"$download_folder"/"*.zip" -d ./"$download_folder"
     rm ./"$download_folder"/*.zip
 }
@@ -62,18 +62,18 @@ download_geonames_data() {
 create_db() {
     echo "Creating database $dbname..."
     mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "DROP DATABASE IF EXISTS $dbname;"
-    mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8;" 
+    mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8mb4;" 
     mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "USE $dbname;" 
     mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword $dbname < geonames_db_struct.sql
 }
 
-create-tables() {
+create_tables() {
     echo "Creating tables for database $dbname..."
     mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword -Bse "USE $dbname;" 
     mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword $dbname < geonames_db_struct.sql
 }
 
-import-dumps() {
+import_dumps() {
     echo "Importing geonames dumps into database $dbname"
     mysql -h $dbhost -P $dbport -u $dbusername -p$dbpassword --local-infile=1 $dbname < geonames_import_data.sql
 }
@@ -119,7 +119,7 @@ case "$action" in
     auto-import)
         download_geonames_data
         create_db
-        import-dumps
+        import_dumps
     ;;
 
     create-db)
@@ -127,11 +127,11 @@ case "$action" in
     ;;
         
     create-tables)
-        create-tables
+        create_tables
     ;;
     
     import-dumps)
-        import-dumps
+        import_dumps
     ;;    
     
     drop-db)
