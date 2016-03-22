@@ -45,7 +45,7 @@ download_geonames_data() {
 			echo "Folder '$download_folder' doesn't exists. Run mkdir..."
 			mkdir "$download_folder"
 	fi
-    dumps="allCountries.zip"
+    dumps="allCountries.zip alternateNames.zip hierarchy.zip admin1CodesASCII.txt admin2Codes.txt featureCodes_en.txt timeZones.txt countryInfo.txt"
     zip_codes="allCountries.zip"
     for dump in $dumps; do
         wget -c -P "$download_folder" http://download.geonames.org/export/dump/$dump
